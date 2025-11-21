@@ -12,7 +12,7 @@ export default function Page() {
 
   const pathname = usePathname();
 
-  
+  // Nouveau commentaire
   return (
     <main className="flex min-h-screen flex-col p-6">
       <div className="flex h-20 shrink-0 bg-blue-500 items-end bg-center rounded-lg p-4 md:h-[400px]">
