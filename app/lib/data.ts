@@ -16,12 +16,12 @@ export async function fetchRevenue() {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
 
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    // console.log('récuparation de données ...');
+    // await new Promise((resolve) => setTimeout(resolve, 10000));
 
     const data = await sql<Revenue[]>`SELECT * FROM revenue`;
 
-    // console.log('Data fetch completed after 3 seconds.');
+    // console.log('données récupérées après 10 secondes');
 
     return data;
   } catch (error) {
@@ -50,11 +50,17 @@ export async function fetchLatestInvoices() {
   }
 }
 
+//  Récupération des données pour les cartes
 export async function fetchCardData() {
   try {
-    // You can probably combine these into a single SQL query
-    // However, we are intentionally splitting them to demonstrate
-    // how to initialize multiple queries in parallel with JS.
+    /**
+     * Pour une bonne récupération des données, vous devez suivre les étapes suivantes
+     * 1. Créer des requêtes SQL pour récupérer les données
+     * 2. Exécuter les requêtes
+     * 3. Transformer les données
+     */
+
+    // Requêtes SQL pour récupérer les données
     const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
     const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
     const invoiceStatusPromise = sql`SELECT
@@ -62,12 +68,14 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
 
+    // Exécution des requêtes en parallèle
     const data = await Promise.all([
       invoiceCountPromise,
       customerCountPromise,
       invoiceStatusPromise,
     ]);
 
+    // Transformation des données
     const numberOfInvoices = Number(data[0][0].count ?? '0');
     const numberOfCustomers = Number(data[1][0].count ?? '0');
     const totalPaidInvoices = formatCurrency(data[2][0].paid ?? '0');
