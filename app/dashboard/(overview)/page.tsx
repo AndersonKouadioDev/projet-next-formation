@@ -2,19 +2,16 @@ import { Card } from "@/app/ui/dashboard/cards";
 import RevenueChart from "@/app/ui/dashboard/revenue-chart";
 import LatestInvoices from "@/app/ui/dashboard/latest-invoices";
 import { lusitana } from "@/app/ui/fonts";
+import { Suspense } from "react";
+import { RevenueChartSkeleton } from "@/app/ui/skeletons";
 
-import {
-  fetchRevenue,
-  fetchLatestInvoices,
-  fetchCardData,
-} from "@/app/lib/data";
+import { fetchLatestInvoices, fetchCardData } from "@/app/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
   // Récupération des données en SQL directement depuis la base de données
   const [
-    revenue,
     latestInvoices,
     {
       numberOfCustomers,
@@ -22,11 +19,7 @@ export default async function Page() {
       totalPaidInvoices,
       totalPendingInvoices,
     },
-  ] = await Promise.all([
-    fetchRevenue(),
-    fetchLatestInvoices(),
-    fetchCardData(),
-  ]);
+  ] = await Promise.all([fetchLatestInvoices(), fetchCardData()]);
 
   return (
     <main>
@@ -44,7 +37,9 @@ export default async function Page() {
         />
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        <RevenueChart revenue={revenue} />
+        <Suspense fallback={<RevenueChartSkeleton />}>
+          <RevenueChart />
+        </Suspense>
         <LatestInvoices latestInvoices={latestInvoices} />
       </div>
     </main>
